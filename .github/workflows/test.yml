@@ -1,31 +1,32 @@
-name: Test Build
+名字: 测试构建
 
-on:
-#  push:
-#    branches:
-#      - main
-#  pull_request:
-  workflow_dispatch:
+在:
+#推送:
+分支机构数量:
+# -主要
+#拉取请求:
+工作流_调度:
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - name: Build With Gradle
-        run: |
-          chmod +x gradlew
-          ./gradlew assemblerelease --build-cache --parallel --daemon --warning-mode all
-      - name: Prepare App
-        run: |
-          mkdir -p ${{ github.workspace }}/apk/
-          for file in `find ~ -name "*.apk" -print`; do
-            mv "$file" ${{ github.workspace }}/apk/
-          done
-      - name: Upload App To Artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: com.github.tvbox.osc
-          path: ${{ github.workspace }}/apk/*
+工作:
+建设:
+连续运行: Ubuntu-最新版
+步伐:
+      - 使用: 动作/签出@v3
+随着:
+提取深度: 0
+      - 名字: 与Gradle一起构建
+奔跑: |
+chmod +x gradlew
+。/grad Lew assembler ease-build-cache-parallel-daemon-warning-mode all
+      - 名字: 准备应用程序
+奔跑: |
+mkdir-p $ { { github . workspace } }/apk/
+对于“查找~-名称”中的文件。apk "-print `；做
+mv " $ file " $ { { github . workspace } }/apk/
+完成的
+   - 名字: 上传打包好的APK
+使用: 动作/上传-工件@v4
+随着:
+名字: 释放-apk
+小路: 应用程序/构建/输出/apk/发布/*。apk
+写得过多: 真实的# v4必须加,允许重复覆盖同名安装包
