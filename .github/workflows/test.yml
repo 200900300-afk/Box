@@ -1,29 +1,38 @@
-name: 自动打包安卓APK
+name: 安卓APK自动打包
 on:
   push:
     branches: [ main ]
   workflow_dispatch: # 支持手动点击打包
+# 全局强制Node24（可选，升级完Action可删掉）
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 jobs:
-  build:
+  build-apk:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      # 配置JDK17
-      - name: 设置JDK
-        uses: actions/setup-java@v4
+      # 拉取代码 v5
+      - name: 检出源码
+        uses: actions/checkout@v5
+
+      # 配置JDK v5
+      - name: 配置JDK17
+        uses: actions/setup-java@v5
         with:
           java-version: 17
           distribution: 'temurin'
-      # 赋予gradlew执行权限
-      - name: 授权打包脚本
+
+      # 赋予打包权限
+      - name: 授权gradlew
         run: chmod +x ./gradlew
-      # 编译正式Release签名包
-      - name: 编译Release APK
+
+      # 编译Release正式包
+      - name: 编译APK
         run: ./gradlew assembleRelease
-      # 修复后的v4上传步骤
-      - name: 上传APK产物
-        uses: actions/upload-artifact@v4
+
+      # 上传APK产物 v6
+      - name: 上传安装包
+        uses: actions/upload-artifact@v6
         with:
-          name: apk安装包
-          path: app/build/outputs/apk/release/
+          name: release-apk
+          path: app/build/outputs/apk/release/*.apk
           overwrite: true
