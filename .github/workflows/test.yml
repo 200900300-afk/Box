@@ -1,31 +1,29 @@
-name: Test Build
-
+name: 自动打包安卓APK
 on:
-#  push:
-#    branches:
-#      - main
-#  pull_request:
-  workflow_dispatch:
-
+  push:
+    branches: [ main ]
+  workflow_dispatch: # 支持手动点击打包
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+      # 配置JDK17
+      - name: 设置JDK
+        uses: actions/setup-java@v4
         with:
-          fetch-depth: 0
-      - name: Build With Gradle
-        run: |
-          chmod +x gradlew
-          ./gradlew assemblerelease --build-cache --parallel --daemon --warning-mode all
-      - name: Prepare App
-        run: |
-          mkdir -p ${{ github.workspace }}/apk/
-          for file in `find ~ -name "*.apk" -print`; do
-            mv "$file" ${{ github.workspace }}/apk/
-          done
-      - name: Upload App To Artifact
-        uses: actions/upload-artifact@v3
+          java-version: 17
+          distribution: 'temurin'
+      # 赋予gradlew执行权限
+      - name: 授权打包脚本
+        run: chmod +x ./gradlew
+      # 编译正式Release签名包
+      - name: 编译Release APK
+        run: ./gradlew assembleRelease
+      # 修复后的v4上传步骤
+      - name: 上传APK产物
+        uses: actions/upload-artifact@v4
         with:
-          name: com.github.tvbox.osc
-          path: ${{ github.workspace }}/apk/*
+          name: apk安装包
+          path: app/build/outputs/apk/release/
+          overwrite: true
